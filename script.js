@@ -69,7 +69,7 @@ function displayMessages() {
 
 async function getAIResponse(messages) {
   try {
-    const response = await fetch("https://اسم-مشروعك.vercel.app/api/chat", {
+    const response = await fetch("https://chat-yemen.vercel.app/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
