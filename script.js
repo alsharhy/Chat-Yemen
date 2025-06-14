@@ -3,11 +3,13 @@ let messagesContainer = document.getElementById("messages");
 let sidebar = document.getElementById("sidebar");
 let userInput = document.getElementById("userInput");
 
-let chats = [];
+let chats = [[]]; // تبدأ أول محادثة تلقائيًا
 let currentChatIndex = 0;
 
 window.addEventListener("click", (e) => {
-  if (sidebar.classList.contains("show") && !sidebar.contains(e.target) && e.target.className !== "toggle-sidebar") {
+  if (sidebar.classList.contains("show") &&
+      !sidebar.contains(e.target) &&
+      e.target.className !== "toggle-sidebar") {
     sidebar.classList.remove("show");
   }
 });
@@ -27,7 +29,9 @@ function updateChatList() {
   chatList.innerHTML = "";
   chats.forEach((chat, index) => {
     const li = document.createElement("li");
-    li.textContent = chat[0]?.role === "user" ? chat[0].content.slice(0, 15) : `محادثة ${index + 1}`;
+    // توليد اسم تلقائي للمحادثة
+    const name = chat.find(m => m.role === "user")?.content.slice(0, 15) || `محادثة ${index + 1}`;
+    li.textContent = name;
     li.onclick = () => {
       currentChatIndex = index;
       displayMessages();
@@ -65,7 +69,7 @@ function displayMessages() {
 
 async function getAIResponse(messages) {
   try {
-    const response = await fetch("https://your-vercel-app.vercel.app/chat", {
+    const response = await fetch("https://اسم-مشروعك.vercel.app/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,4 +88,6 @@ async function getAIResponse(messages) {
   }
 }
 
-
+// عند تحميل الصفحة:
+updateChatList();
+displayMessages();
