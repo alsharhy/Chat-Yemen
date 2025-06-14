@@ -1,52 +1,41 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>موقع دردشة AI</title>
-<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <title>Chat with AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; background: #f5f5f5; }
+    textarea, button { width: 100%; padding: 10px; margin-top: 10px; }
+    .chat-box { background: #fff; padding: 10px; margin-top: 20px; border-radius: 8px; }
+    .user, .ai { margin: 10px 0; }
+    .user { text-align: right; color: blue; }
+    .ai { text-align: left; color: green; }
+  </style>
 </head>
 <body>
-<div class="chat-container">
-  <div id="chat-box" class="chat-box"></div>
-  <form id="chat-form">
-    <input type="text" id="user-input" placeholder="اكتب رسالتك هنا..." autocomplete="off" required />
-    <button type="submit">إرسال</button>
-  </form>
-</div>
-<script>
-  const chatBox = document.getElementById("chat-box");
-  const chatForm = document.getElementById("chat-form");
-  const userInput = document.getElementById("user-input");
+  <h2>دردشة مع الذكاء الاصطناعي</h2>
+  <textarea id="message" rows="3" placeholder="اكتب رسالتك..."></textarea>
+  <button onclick="sendMessage()">إرسال</button>
+  <div class="chat-box" id="chatBox"></div>
 
-  function appendMessage(sender, text) {
-    const div = document.createElement("div");
-    div.classList.add("message", sender);
-    div.textContent = text;
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+  <script>
+    async function sendMessage() {
+      const message = document.getElementById("message").value;
+      if (!message) return;
+      const chatBox = document.getElementById("chatBox");
+      chatBox.innerHTML += `<div class='user'>🧑: ${message}</div>`;
+      document.getElementById("message").value = "";
 
-  chatForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const message = userInput.value.trim();
-    if (!message) return;
-    appendMessage("user", message);
-    userInput.value = "";
-    appendMessage("bot", "جاري الرد ...");
-
-    try {
-      const response = await fetch("/api/chat", {
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message })
       });
-      const data = await response.json();
-      chatBox.lastChild.textContent = data.reply || "حدث خطأ في الرد.";
-    } catch (error) {
-      chatBox.lastChild.textContent = "حدث خطأ في الاتصال.";
+
+      const data = await res.json();
+      chatBox.innerHTML += `<div class='ai'>🤖: ${data.reply || "حدث خطأ في الرد"}</div>`;
     }
-  });
-</script>
+  </script>
 </body>
 </html>
