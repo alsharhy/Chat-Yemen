@@ -1,20 +1,24 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY,
-  defaultHeaders: {
-    'HTTP-Referer': 'https://chatyemen.vercel.app',
-    'X-Title': 'ChatYemen AI',
-  },
-});
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { message } = req.body;
+  const { message, apiKey } = req.body;
+
+  if (!apiKey) {
+    return res.status(400).json({ error: 'API key is required.' });
+  }
+
+  const openai = new OpenAI({
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey: apiKey,
+    defaultHeaders: {
+      'HTTP-Referer': 'https://chatyemen.vercel.app',
+      'X-Title': 'ChatYemen AI',
+    },
+  });
 
   try {
     const completion = await openai.chat.completions.create({
