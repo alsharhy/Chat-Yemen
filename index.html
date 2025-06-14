@@ -1,28 +1,30 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>محادثة الذكاء الاصطناعي</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chat Yemen - دردشة الذكاء الاصطناعي</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="chat-app">
-    <div class="sidebar" id="sidebar">
-      <button class="new-chat" onclick="createNewChat()">➕ محادثة جديدة</button>
-      <ul id="chatList"></ul>
-    </div>
+  <header>
+    <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+    <h1>Chat Yemen</h1>
+    <button id="newChatBtn" onclick="createNewChat()">إضافة محادثة جديدة</button>
+  </header>
 
-    <div class="chat-container">
-      <div class="top-bar">
-        <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
-      </div>
-      <div class="messages" id="messages"></div>
-      <div class="input-area">
-        <textarea id="userInput" placeholder="اكتب رسالتك..."></textarea>
+  <div id="container">
+    <aside id="sidebar" class="show">
+      <ul id="chatList"></ul>
+    </aside>
+
+    <main>
+      <div id="messages"></div>
+      <div id="inputArea">
+        <input type="text" id="userInput" placeholder="اكتب رسالتك هنا..." />
         <button onclick="sendMessage()">إرسال</button>
       </div>
-    </div>
+    </main>
   </div>
 
   <script src="script.js"></script>

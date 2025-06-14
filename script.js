@@ -7,9 +7,11 @@ let chats = [[]]; // تبدأ أول محادثة تلقائيًا
 let currentChatIndex = 0;
 
 window.addEventListener("click", (e) => {
-  if (sidebar.classList.contains("show") &&
-      !sidebar.contains(e.target) &&
-      e.target.className !== "toggle-sidebar") {
+  if (
+    sidebar.classList.contains("show") &&
+    !sidebar.contains(e.target) &&
+    e.target.className !== "toggle-sidebar"
+  ) {
     sidebar.classList.remove("show");
   }
 });
@@ -29,8 +31,9 @@ function updateChatList() {
   chatList.innerHTML = "";
   chats.forEach((chat, index) => {
     const li = document.createElement("li");
-    // توليد اسم تلقائي للمحادثة
-    const name = chat.find(m => m.role === "user")?.content.slice(0, 15) || `محادثة ${index + 1}`;
+    const name =
+      chat.find((m) => m.role === "user")?.content.slice(0, 15) ||
+      `محادثة ${index + 1}`;
     li.textContent = name;
     li.onclick = () => {
       currentChatIndex = index;
@@ -69,7 +72,7 @@ function displayMessages() {
 
 async function getAIResponse(messages) {
   try {
-    const response = await fetch("https://chat-yemen.vercel.app/api/chat", {
+    const response = await fetch("/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
