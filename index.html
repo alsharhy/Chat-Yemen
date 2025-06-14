@@ -1,32 +1,52 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chat Yemen - دردشة الذكاء الاصطناعي</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>موقع دردشة AI</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
-    <h1>Chat Yemen</h1>
-    <button id="newChatBtn" onclick="createNewChat()">إضافة محادثة جديدة</button>
-  </header>
+<div class="chat-container">
+  <div id="chat-box" class="chat-box"></div>
+  <form id="chat-form">
+    <input type="text" id="user-input" placeholder="اكتب رسالتك هنا..." autocomplete="off" required />
+    <button type="submit">إرسال</button>
+  </form>
+</div>
+<script>
+  const chatBox = document.getElementById("chat-box");
+  const chatForm = document.getElementById("chat-form");
+  const userInput = document.getElementById("user-input");
 
-  <div id="container">
-    <aside id="sidebar" class="show">
-      <ul id="chatList"></ul>
-    </aside>
+  function appendMessage(sender, text) {
+    const div = document.createElement("div");
+    div.classList.add("message", sender);
+    div.textContent = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
 
-    <main>
-      <div id="messages"></div>
-      <div id="inputArea">
-        <input type="text" id="userInput" placeholder="اكتب رسالتك هنا..." />
-        <button onclick="sendMessage()">إرسال</button>
-      </div>
-    </main>
-  </div>
+  chatForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const message = userInput.value.trim();
+    if (!message) return;
+    appendMessage("user", message);
+    userInput.value = "";
+    appendMessage("bot", "جاري الرد ...");
 
-  <script src="script.js"></script>
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+      const data = await response.json();
+      chatBox.lastChild.textContent = data.reply || "حدث خطأ في الرد.";
+    } catch (error) {
+      chatBox.lastChild.textContent = "حدث خطأ في الاتصال.";
+    }
+  });
+</script>
 </body>
 </html>
