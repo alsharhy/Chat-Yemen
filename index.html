@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>محادثة الذكاء الاصطناعي</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="chat-app">
+    <div class="sidebar" id="sidebar">
+      <button class="new-chat" onclick="createNewChat()">➕ محادثة جديدة</button>
+      <ul id="chatList"></ul>
+    </div>
+
+    <div class="chat-container">
+      <div class="top-bar">
+        <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+      </div>
+      <div class="messages" id="messages"></div>
+      <div class="input-area">
+        <textarea id="userInput" placeholder="اكتب رسالتك..."></textarea>
+        <button onclick="sendMessage()">إرسال</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
