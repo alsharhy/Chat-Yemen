@@ -2,7 +2,7 @@
 
 let chats = [];
 let currentChatId = null;
-let apiKey = localStorage.getItem('apiKey') || "";
+let apiKey = localStorage.getItem('apiKey') || "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";
 
 function generateId() {
   return Math.random().toString(36).substr(2, 9);
@@ -83,7 +83,7 @@ function initEmojis() {
 
 function openSettings() {
   document.getElementById('settings-modal').style.display = 'flex';
-  document.getElementById('api-key').value = apiKey;
+  document.getElementById('api-key').value = localStorage.getItem("apiKey") || "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";
   showProfileSettings();
 }
 
@@ -116,8 +116,9 @@ function saveSettings() {
   localStorage.setItem("username", document.getElementById("username").value);
   localStorage.setItem("email", document.getElementById("email").value);
   localStorage.setItem("profileImage", document.getElementById("profile-image").src);
+
   apiKey = document.getElementById('api-key').value;
-  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiKey', apiKey); // ← هذا يحفظ المفتاح الجديد
   closeSettings();
   alert("تم حفظ الإعدادات بنجاح!");
 }
