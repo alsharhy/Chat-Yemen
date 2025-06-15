@@ -1,8 +1,0 @@
-{
-  "name": "chat-ai-openrouter",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "openai": "^4.21.0"
-  }
-}
