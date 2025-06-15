@@ -12,8 +12,22 @@ function formatTime(date = new Date()) {
   return date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
 }
 
+function checkAPIStatus() {
+  fetch("https://openrouter.ai/api/v1/models")
+    .then(response => {
+      if (!response.ok) {
+        console.error("مشكلة في اتصال OpenRouter API");
+      } else {
+        console.log("اتصال API يعمل بشكل صحيح");
+      }
+    })
+    .catch(error => console.error("فشل الاتصال بـ OpenRouter:", error));
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  checkAPIStatus();
   initEmojis();
+  
   document.addEventListener("click", function (event) {
     const sidebar = document.getElementById("sidebar");
     const dropdown = document.getElementById("dropdown");
@@ -214,43 +228,76 @@ function sendMessage(customPrompt = null) {
 
   if (!currentChatId) startNewChat();
   const chat = chats.find((c) => c.id === currentChatId);
+
+  // أضف رسالة المستخدم
   chat.messages.push({ role: "user", content: prompt, timestamp: new Date() });
   renderMessages();
+
+  // أضف مؤشر الكتابة
   const typingMsg = { role: "assistant", content: "جارٍ الكتابة...", timestamp: new Date() };
   chat.messages.push(typingMsg);
   renderMessages();
+
+  // إزالة رسالة "جارٍ الكتابة" من الرسائل التي سترسلها
+  const payloadMessages = chat.messages
+    .filter(m => !(m.role === 'assistant' && m.content === "جارٍ الكتابة..."))
+    .map(({ role, content }) => ({ role, content }));
 
   fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": "https://example.com",
-      "X-Title": "AI-Test",
+      "Authorization": `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://your-website.com", // غيّره حسب نطاقك
+      "X-Title": "AI Chat"
     },
     body: JSON.stringify({
       model: "openai/gpt-4o",
-      messages: chat.messages.filter(m => m.role !== 'assistant' || m.content !== "جارٍ الكتابة...").map(({ role, content }) => ({ role, content })),
-      max_tokens: 500,
+      messages: payloadMessages,
+      max_tokens: 1000
     }),
   })
-    .then(res => res.json())
-    .then(data => {
-      const content = data.choices?.[0]?.message?.content || "لم أتمكن من إيجاد رد مناسب.";
-      chat.messages.pop();
-      chat.messages.push({ role: "assistant", content, timestamp: new Date() });
-      if (chat.title === "محادثة جديدة") {
-        chat.title = content.slice(0, 30) + (content.length > 30 ? "..." : "");
-        updateChatList();
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(err => { throw new Error(JSON.stringify(err)) });
+    }
+    return response.json();
+  })
+  .then(data => {
+    chat.messages.pop(); // حذف مؤشر الكتابة
+    const content = data.choices?.[0]?.message?.content || "لم أتمكن من إيجاد رد مناسب.";
+    chat.messages.push({ role: "assistant", content, timestamp: new Date() });
+
+    if (chat.title === "محادثة جديدة") {
+      chat.title = content.slice(0, 30) + (content.length > 30 ? "..." : "");
+      updateChatList();
+    }
+
+    renderMessages();
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    chat.messages.pop(); // حذف مؤشر الكتابة
+
+    let errorMsg = "حدث خطأ أثناء جلب الرد. يرجى المحاولة مرة أخرى.";
+    try {
+      const errorData = JSON.parse(error.message);
+      if (errorData.error && errorData.error.message) {
+        errorMsg = errorData.error.message;
       }
-      renderMessages();
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      chat.messages.pop();
-      chat.messages.push({ role: "assistant", content: "حدث خطأ أثناء جلب الرد. يرجى المحاولة مرة أخرى.", timestamp: new Date() });
-      renderMessages();
-    });
+    } catch (e) {
+      if (error.message.includes("401")) {
+        errorMsg = "مفتاح API غير صحيح أو منتهي الصلاحية";
+      } else if (error.message.includes("402")) {
+        errorMsg = "انتهى رصيدك في OpenRouter";
+      } else if (error.message.includes("404")) {
+        errorMsg = "نقطة النهاية غير صحيحة";
+      }
+    }
+
+    chat.messages.push({ role: "assistant", content: errorMsg, timestamp: new Date() });
+    renderMessages();
+  });
 }
 
 function startNewChat() {
