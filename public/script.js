@@ -2,7 +2,7 @@
 
 let chats = [];
 let currentChatId = null;
-let apiKey = localStorage.getItem('apiKey') || "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";
+let apiKey = localStorage.getItem('apiKey') || "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";
 
 function generateId() {
   return Math.random().toString(36).substr(2, 9);
